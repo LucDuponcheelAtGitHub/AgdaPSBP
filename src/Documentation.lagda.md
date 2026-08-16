@@ -964,10 +964,10 @@ main =
   -- mainPlusOne_Add_TimesTwo
   -- mainTimesTwo_Add_PlusOne
   -- mainSelf_Add_PlusOne
-  mainSelf_Add_PlusOne_WithEnv
+  -- mainSelf_Add_PlusOne_WithEnv
   -- mainEnvResulting_Self_Add_PlusOne_WithEnv
   -- mainFibonacci
-  -- mainFactorial
+  mainFactorial
 ```
 
 
