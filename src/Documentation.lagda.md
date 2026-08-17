@@ -315,7 +315,7 @@ materializeFunction = λ f → f
 
 ```agda
 open import Data.Nat.Show using (show)
-open import IO
+open import IO hiding (_>>=_)
 
 instance
   _ = functionFunctional
@@ -950,6 +950,147 @@ $ ./Documentation
 factorial(10) = 3628800
 ```
 
+## Computations
+
+In the introduction we already mentioned computations `M : Set → Set`.
+
+Below we deifine `computationValuedFunction` for such an `M`
+
+```agda
+computationValuedFunction : (Set → Set) → Set → Set → Set
+computationValuedFunction M Z Y = Z → M Y
+```
+
+### `computationValuedFunction M` instances
+
+Agda comes with its own `record RawMonad` tha comes with `do ... return ...` syntax.
+
+Below are instances defined for `Functional`, `Functorial`, `Sequential`, `Creational` and
+`Conditional`. They are defined in a `module` in order not to have to repeat `M`m `monad` and
+universe level `zero` all the time.
+
+```agda
+open import Level using (zero)
+open import Effect.Monad using (RawMonad)
+
+module ComputationValuedFunctionInstances 
+  {M : Set → Set} (monad : RawMonad {zero} {zero} M) where
+  open RawMonad monad
+
+  computationValuedFunctionFunctional : Functional (computationValuedFunction M)
+  computationValuedFunctionFunctional = record
+    { asProgram = λ f z → return (f z)
+    }
+
+  computationValuedFunctionFunctorial : Functorial (computationValuedFunction M)
+  computationValuedFunctionFunctorial = record
+    { functionAction = λ g f z → do
+        y ← f z
+        return (g y)
+    }
+
+  computationValuedFunctionSequential : Sequential (computationValuedFunction M)
+  computationValuedFunctionSequential = record
+    { andThenProgram = λ f g z → do
+        y ← f z
+        g y
+    }
+
+  computationValuedFunctionCreational : Creational (computationValuedFunction M)
+  computationValuedFunctionCreational = record
+    { sequentialProduct = λ f g z → do
+        y ← f z
+        x ← g z
+        return (y , x)
+    }
+
+  computationValuedFunctionConditional : Conditional (computationValuedFunction M)
+  computationValuedFunctionConditional = record
+    { sum = λ { f g (inj₁ z) → f z ; f g (inj₂ y) → g y }
+    }
+```
+
+### `Id` `RawMonad` instance
+
+For now we only set the scene of working with computation valued function implementations by using
+the trivial `Id` `RawMonad` instance. 
+
+`Id` first has to implement `record RawFunctor`, which is more
+general than `record RawApplicative`, and`record RawApplicative`, which is more
+general than `record RawMonad`.
+
+We come back to `record RawFunctor` and `record RawApplicative` later.
+
+
+```agda
+open import Effect.Functor using (RawFunctor)
+open import Effect.Applicative using (RawApplicative)
+
+Id : Set → Set
+Id A = A
+
+idFunctor : RawFunctor {zero} {zero} Id
+idFunctor = record { _<$>_ = λ f x → f x }
+
+idApplicative : RawApplicative {zero} {zero} Id
+idApplicative = record
+  { rawFunctor = idFunctor
+  ; pure = λ x → x
+  ; _<*>_ = λ f x → f x
+  }
+
+idMonad : RawMonad {zero} {zero} Id
+idMonad = record
+  { rawApplicative = idApplicative
+  ; _>>=_ = λ x f → f x
+  }
+```
+
+```agda
+materializeIdComputationValuedFunction :
+  {Z Y : Set} →
+  computationValuedFunction Id Z Y → function Z Y
+materializeIdComputationValuedFunction f = f
+```
+
+```agda
+open ComputationValuedFunctionInstances idMonad
+
+instance
+  _ = computationValuedFunctionFunctional
+instance
+  _ = computationValuedFunctionFunctorial
+instance
+  _ = computationValuedFunctionSequential
+instance
+  _ = computationValuedFunctionCreational
+
+materializedIdTimesTwoAddPlusOne : ℕ → ℕ
+materializedIdTimesTwoAddPlusOne = 
+  materializeIdComputationValuedFunction 
+    (timesTwo_Add_PlusOne {program = computationValuedFunction Id})
+
+mainTimesTwoAddPlusOneId : Main
+mainTimesTwoAddPlusOneId = run (
+  do
+    putStrLn "Id computation-valued timesTwo_Add_PlusOne"
+    putStr "("
+    putStr (show n)
+    putStr " * 2) + ("
+    putStr (show n)
+    putStr " + 1) = "
+    putStrLn (show (materializedIdTimesTwoAddPlusOne n))
+  )
+```
+
+After compiling, running `./Documentation` yields
+
+```txt
+$ ./Documentation
+Id computation-valued timesTwo_Add_PlusOne
+(10 * 2) + (10 + 1) = 31
+```
+
 ## `main`
 
 **Please uncomment the example that you want to run.**
@@ -967,7 +1108,8 @@ main =
   -- mainSelf_Add_PlusOne_WithEnv
   -- mainEnvResulting_Self_Add_PlusOne_WithEnv
   -- mainFibonacci
-  mainFactorial
+  -- mainFactorial
+  mainTimesTwoAddPlusOneId
 ```
 
 
