@@ -183,7 +183,7 @@ The `Functional` specification declares `asProgram` treating functions `function
 The specification also defines `identity`, the identity program.
 
 ```agda
-record Functional (program : Set → Set → Set) : Set1 where
+record Functional (program : Set → Set → Set) : Set₁ where
   field
     asProgram : {Z Y : Set} → function Z Y → program Z Y
 
@@ -305,7 +305,6 @@ functionFunctional = record { asProgram = λ f → f }
 It should not come as a surprise that functions, `function Z Y`, are materialized as functions
 `function Z Y` using `materializeFunction`.
 
-
 ```agda
 materializeFunction : {Z Y : Set} → function Z Y → function Z Y
 materializeFunction = λ f → f
@@ -351,7 +350,7 @@ The next specification declares `functionAction` letting functions `function Y X
 The specification also defines `_>==_`, an infix version of `functionAction`.
 
 ```agda
-record Functorial (program : Set → Set → Set) : Set1 where
+record Functorial (program : Set → Set → Set) : Set₁ where
   field
     functionAction : {Z Y X : Set} → function Y X → (program Z Y → program Z X)
 
@@ -421,7 +420,7 @@ programs `program Y X` yielding programs `program Z X`.
 The specification also defines `_>>>_`, an infix version of `andThenProgram`.
 
 ```agda
-record Sequential (program : Set → Set → Set) : Set1 where
+record Sequential (program : Set → Set → Set) : Set₁ where
   field
     andThenProgram : {Z Y X : Set} → program Z Y → program Y X → program Z X
 
@@ -513,7 +512,7 @@ used for simple, script like sequential programs with a simple environment.
 ### `Creational` specification
 
 ```agda
-record Creational (program : Set → Set → Set) : Set1 where
+record Creational (program : Set → Set → Set) : Set₁ where
   field
     sequentialProduct : {Z Y X : Set} → program Z Y → program Z X → program Z (Y × X)
 
@@ -688,7 +687,8 @@ $ ./Documentation
 ### Program examples
 
 Program `self_Add_PlusOne_WithEnv` is a variation of `self_Add_PlusOne` that explicitly uses
-the environment, starting with the empty environment `⊤` together with an argument.
+the environment, starting with the empty environment, modeled as the singleton type `⊤`,
+together with an argument.
 
 ```agda
 open import Data.Unit using (⊤)
@@ -817,7 +817,7 @@ language level `if ... then ... else ...` .
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Bool using (Bool; true; false)
 
-record Conditional (program : Set → Set → Set) : Set1 where
+record Conditional (program : Set → Set → Set) : Set₁ where
   field
     sum : {Z Y X : Set} → program Z X → program Y X → program (Z ⊎ Y) X
 
@@ -966,7 +966,7 @@ computationValuedFunction M Z Y = Z → M Y
 Agda comes with its own `record RawMonad` tha comes with `do ... return ...` syntax.
 
 Below are instances defined for `Functional`, `Functorial`, `Sequential`, `Creational` and
-`Conditional`. They are defined in a `module` in order not to have to repeat `M`m `monad` and
+`Conditional`. They are defined in a `module` in order not to have to repeat `M`, `monad` and
 universe level `zero` all the time.
 
 ```agda
@@ -1010,7 +1010,7 @@ module ComputationValuedFunctionInstances
     }
 ```
 
-### `Id` `RawMonad` instance
+### `idMonad` implementation
 
 For now we only set the scene of working with computation valued function implementations by using
 the trivial `Id` `RawMonad` instance. 
@@ -1020,7 +1020,6 @@ general than `record RawApplicative`, and`record RawApplicative`, which is more
 general than `record RawMonad`.
 
 We come back to `record RawFunctor` and `record RawApplicative` later.
-
 
 ```agda
 open import Effect.Functor using (RawFunctor)
@@ -1045,6 +1044,12 @@ idMonad = record
   ; _>>=_ = λ x f → f x
   }
 ```
+
+### `materializeIdComputationValuedFunction` materialization
+
+It should not come as a surprise that computation valued functions,
+`computationValuedFunction Id Z Y`, are materialized as functions
+`function Z Y` using `materializeIdComputationValuedFunction`.
 
 ```agda
 materializeIdComputationValuedFunction :
@@ -1091,6 +1096,226 @@ Id computation-valued timesTwo_Add_PlusOne
 (10 * 2) + (10 + 1) = 31
 ```
 
+## `WithState`
+
+### `WithState` specification
+
+The `WithState (S : Set)` specification declares `readState` a `program Z S` and `writeState` a
+`program S ⊤`, where the result type is modeled as the singleton type `⊤`.
+
+The specification also defines `modifyStateWithFunction` and `modifyStateWith`. 
+
+```agda
+open import Data.Product using (proj₁)
+
+record WithState (S : Set) (program : Set → Set → Set) : Set₁ where
+  field
+    readState  : {Z : Set} → program Z S
+    writeState : program S ⊤
+
+  modifyStateWithFunction :
+    {{_ : Functional program}} 
+    {{_ : Sequential program}} 
+    {{_ : Creational program}} →
+    {Z : Set} → function S S → program Z Z
+  modifyStateWithFunction f =
+    LET (readState >>> asProgram f >>> writeState) IN asProgram proj₁
+
+  modifyStateWith :
+    {{_ : Functional program}} 
+    {{_ : Sequential program}} 
+    {{_ : Creational program}} →
+    {Z : Set} → program S S → program Z Z
+  modifyStateWith p =
+    LET (readState >>> p >>> writeState) IN asProgram proj₁
+```
+
+### Program examples
+
+`fibonacciWithState` is a program consisting of `readState` for using the state as an argument, 
+sequentially composed with `fibonacci`, sequentially composed with incrementing the state using
+`modifyStateWith plusOne` as a, somewhat unusual, side effect.
+
+```agda
+open WithState {{...}}
+
+{-# TERMINATING #-}
+fibonacciWithState :
+  {program : Set → Set → Set}
+  {{_ : Functional program}}
+  {{_ : Sequential program}}
+  {{_ : Creational program}}
+  {{_ : Conditional program}}
+  {{_ : WithState ℕ program}} → program ⊤ ℕ
+fibonacciWithState =
+  readState >>> fibonacci >>> modifyStateWith plusOne
+```
+
+### `stateTMonad` and `stateTWithState` implementation
+
+`StateT S` transforms a computation to a computation that threads a state along its execution. 
+
+Below are instances defined for `RawMonad` and `WithState`. They are defined in a `module` in order
+not to have to repeat `S`, `M`, `monad` and universe level `zero` all the time.
+
+```agda
+StateT : Set → (Set → Set) → Set → Set
+StateT S M Y = S → M (Y × S)
+
+module StateTInstances {S : Set} {M : Set → Set} (monad : RawMonad {zero} {zero} M) where
+  open RawMonad monad
+
+  stateTMonad : RawMonad {zero} {zero} (StateT S M)
+  stateTMonad = record
+    { rawApplicative = record
+        { rawFunctor = record
+            { _<$>_ = λ f st s → do
+                (y , s') ← st s
+                return (f y , s')
+            }
+        ; pure = λ y s → return (y , s)
+        ; _<*>_ = λ sf st s → do
+            (f , s') ← sf s
+            (y , s'') ← st s'
+            return (f y , s'')
+        }
+    ; _>>=_ = λ st f s → do
+        (y , s') ← st s
+        f y s'
+    }
+
+  open ComputationValuedFunctionInstances stateTMonad public
+
+  computationValuedFunctionStateTWithState : WithState S (computationValuedFunction (StateT S M))
+  computationValuedFunctionStateTWithState = record
+    { readState = λ _ s → return (s , s)
+    ; writeState = λ s' _ → return (tt , s')
+    }
+```
+
+### `IdStateTInstance`
+
+The simplest instance is `IdStateTInstance` using `Id` and `idMonad`.
+
+```agda
+module IdStateTInstance {S : Set} where
+  open StateTInstances {S} {Id} idMonad public
+```
+
+### `materializeIdStateTComputationValuedFunction` materialization
+
+The most verbose way to materialize computation valued functions
+`computationValuedFunction (StateT S Id) Z Y` is as functions
+`function Z (function S (Y × S))`
+
+
+```agda
+materializeIdStateTComputationValuedFunction :
+  {S Z Y : Set} →
+  computationValuedFunction (StateT S Id) Z Y → function Z (function S (Y × S))
+materializeIdStateTComputationValuedFunction f = f
+```
+
+### `mainFibonacciWithState` using `fibonacciWithState`
+
+```agda
+instance
+  _ = IdStateTInstance.computationValuedFunctionFunctional {ℕ}
+instance
+  _ = IdStateTInstance.computationValuedFunctionSequential {ℕ}
+instance
+  _ = IdStateTInstance.computationValuedFunctionCreational {ℕ}
+instance
+  _ = IdStateTInstance.computationValuedFunctionConditional {ℕ}
+instance
+  _ = IdStateTInstance.computationValuedFunctionStateTWithState {ℕ}
+
+materializedFibonacciWithState : ℕ → (ℕ × ℕ)
+materializedFibonacciWithState = 
+   materializeIdStateTComputationValuedFunction 
+     (fibonacciWithState {program = computationValuedFunction (StateT ℕ Id)}) tt
+
+mainFibonacciWithState : Main
+mainFibonacciWithState = run (
+  do 
+    let 
+      initialState = n
+      (result , finalState) = materializedFibonacciWithState initialState
+    putStr "fibonacciWithState initial state = "
+    putStr (show initialState)
+    putStr "\nFibonacci result = "
+    putStr (show result)
+    putStr "\nFinal state after increment (+1) = "
+    putStrLn (show finalState)
+  )
+```
+
+After compiling, running `./Documentation` yields
+
+```txt
+$ ./Documentation
+fibonacciWithState initial state = 10
+Fibonacci result = 89
+Final state after increment (+1) = 11
+```
+
+### Program examples
+
+`fibonacciWithStatePair` is simply defined as the product of `fibonacciWithState` with
+`fibonacciWithState`.
+
+```agda
+{-# TERMINATING #-}
+fibonacciWithStatePair :
+  {program : Set → Set → Set}
+  {{_ : Functional program}}
+  {{_ : Sequential program}}
+  {{_ : Creational program}}
+  {{_ : Conditional program}}
+  {{_ : WithState ℕ program}} → program ⊤ (ℕ × ℕ)
+fibonacciWithStatePair = fibonacciWithState |x| fibonacciWithState
+```
+
+### `mainFibonacciWithStatePair` using `fibonacciWithStatePair`
+
+
+```agda
+materializedFibonacciWithStatePair : ℕ → ((ℕ × ℕ) × ℕ)
+materializedFibonacciWithStatePair = 
+  materializeIdStateTComputationValuedFunction 
+    (fibonacciWithStatePair {program = computationValuedFunction (StateT ℕ Id)}) tt
+
+mainFibonacciWithStatePair : Main
+mainFibonacciWithStatePair = run (
+  do 
+    let
+      initialState = n 
+      ((result1 , result2) , finalState) = materializedFibonacciWithStatePair n
+    putStr "fibonacciWithStatePair initial state = "
+    putStrLn (show initialState)
+    putStr "First fibonacciPair result = "
+    putStr (show result1)
+    putStr "\nSecond fibonacciPair result = "
+    putStr (show result2)
+    putStr "\nFinal state after two increments (+2) = "
+    putStrLn (show finalState)
+  )
+```
+
+
+After compiling, running `./Documentation` yields
+
+```txt
+fibonacciWithStatePair initial state = 10
+First fibonacciPair result = 89
+Second fibonacciPair result = 144
+Final state after two increments (+2) = 12
+```
+
+Note that we have implemented statefulness in a way that does not require to change contents of
+regions of memory. This illustrates that statefulness can be seen as an algebraic property of
+computation flow.
+
 ## `main`
 
 **Please uncomment the example that you want to run.**
@@ -1109,7 +1334,9 @@ main =
   -- mainEnvResulting_Self_Add_PlusOne_WithEnv
   -- mainFibonacci
   -- mainFactorial
-  mainTimesTwoAddPlusOneId
+  -- mainTimesTwoAddPlusOneId
+  -- mainFibonacciWithState
+  mainFibonacciWithStatePair
 ```
 
 
