@@ -1,8 +1,11 @@
 module Examples.Creational.Self_Add_PlusOne_WithEnv where
 
-open import Data.Nat using (ℕ)
-open import Data.Unit using (⊤)
 open import Data.Product using (_×_)
+
+open import Data.Unit using (⊤)
+
+open import Data.Nat using (ℕ)
+
 open import Specifications.Functional
 open import Specifications.Sequential
 open import Specifications.Creational

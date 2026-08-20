@@ -1,12 +1,13 @@
 module Materializations.IdComputationValuedFunction where
 
+open import Effect.Monad.Identity as IdentityModule public
+  using (Identity; runIdentity)
+
 open import Utilities.Function
 
 open import Utilities.ComputationValuedFunction
 
-open import Implementations.IdComputation using (Id)
-
 materializeIdComputationValuedFunction :
   {Z Y : Set} →
-  computationValuedFunction Id Z Y → function Z Y
-materializeIdComputationValuedFunction f = f
+  computationValuedFunction Identity Z Y → function Z Y
+materializeIdComputationValuedFunction f z = runIdentity (f z)

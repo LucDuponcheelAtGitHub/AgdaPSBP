@@ -3,12 +3,19 @@ module Mains.Function.Conditional.Fibonacci where
 
 open import Data.Nat using (ℕ)
 open import Data.Nat.Show using (show)
+
 open import IO
 
-open import Examples.Conditional.Fibonacci using (fibonacci)
 open import Implementations.Function using
-  (functionFunctional; functionFunctorial; functionSequential; functionCreational; functionConditional)
+  (functionFunctional; 
+  functionFunctorial;
+  functionSequential;
+  functionCreational;
+  functionConditional)
+
 open import Materializations.Function using (materializeFunction)
+
+open import Examples.Conditional.Fibonacci using (fibonacci)
 
 instance
   _ = functionFunctional

@@ -3,12 +3,15 @@ module Mains.Function.Creational.TimesTwo_Add_PlusOne where
 
 open import Data.Nat using (ℕ)
 open import Data.Nat.Show using (show)
+
 open import IO
 
-open import Examples.Creational.TimesTwo_Add_PlusOne using (timesTwo_Add_PlusOne)
 open import Implementations.Function using
   (functionFunctional; functionSequential; functionCreational)
+
 open import Materializations.Function using (materializeFunction)
+
+open import Examples.Creational.TimesTwo_Add_PlusOne using (timesTwo_Add_PlusOne)
 
 instance
   _ = functionFunctional

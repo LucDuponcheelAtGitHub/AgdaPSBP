@@ -3,12 +3,15 @@ module Mains.Function.Sequential.TimesTwoPlusOneTimesTwo where
 
 open import Data.Nat using (ℕ)
 open import Data.Nat.Show using (show)
+
 open import IO
 
-open import Examples.Sequential.TimesTwoPlusOneTimesTwo using (timesTwoPlusOneTimesTwo)
 open import Implementations.Function using
   (functionFunctional; functionFunctorial; functionSequential)
+
 open import Materializations.Function using (materializeFunction)
+
+open import Examples.Sequential.TimesTwoPlusOneTimesTwo using (timesTwoPlusOneTimesTwo)
 
 instance
   _ = functionFunctional

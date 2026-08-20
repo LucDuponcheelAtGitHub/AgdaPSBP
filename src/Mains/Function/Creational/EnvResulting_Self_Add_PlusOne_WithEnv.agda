@@ -1,16 +1,22 @@
 {-# OPTIONS --guardedness #-}
 module Mains.Function.Creational.EnvResulting_Self_Add_PlusOne_WithEnv where
 
-open import Data.Nat using (ℕ)
-open import Data.Nat.Show using (show)
 open import Data.Unit using (⊤; tt)
+
 open import Data.Product using (_×_; _,_)
+
 open import IO
 
-open import Examples.Creational.EnvResulting_Self_Add_PlusOne_WithEnv using (envResulting_Self_Add_PlusOne_WithEnv)
+open import Data.Nat using (ℕ)
+open import Data.Nat.Show using (show)
+
 open import Implementations.Function using
   (functionFunctional; functionSequential; functionCreational)
+
 open import Materializations.Function using (materializeFunction)
+
+open import Examples.Creational.EnvResulting_Self_Add_PlusOne_WithEnv using 
+  (envResulting_Self_Add_PlusOne_WithEnv)
 
 instance
   _ = functionFunctional
@@ -21,8 +27,10 @@ instance
 instance
   _ = functionCreational
 
-materializedEnvResulting_Self_Add_PlusOne_WithEnv : (⊤ × ℕ) → ((((⊤ × ℕ) × ℕ) × ℕ) × ℕ)
-materializedEnvResulting_Self_Add_PlusOne_WithEnv = materializeFunction envResulting_Self_Add_PlusOne_WithEnv
+materializedEnvResulting_Self_Add_PlusOne_WithEnv : 
+  (⊤ × ℕ) → ((((⊤ × ℕ) × ℕ) × ℕ) × ℕ)
+materializedEnvResulting_Self_Add_PlusOne_WithEnv = 
+  materializeFunction envResulting_Self_Add_PlusOne_WithEnv
 
 n = 10
 

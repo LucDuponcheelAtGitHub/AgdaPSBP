@@ -2,9 +2,11 @@ module Implementations.ComputationValuedFunction where
 
 open import Level using (zero)
 
+open import Data.Product using (_,_)
+
+open import Data.Sum using (inj₁; inj₂)
+
 open import Effect.Monad using (RawMonad)
-open import Data.Product using (_×_; _,_)
-open import Data.Sum using (_⊎_; inj₁; inj₂)
 
 open import Utilities.ComputationValuedFunction
 
@@ -48,3 +50,4 @@ module ComputationValuedFunctionInstances {M : Set → Set} (monad : RawMonad {z
   computationValuedFunctionConditional = record
     { sum = λ { f g (inj₁ z) → f z ; f g (inj₂ y) → g y }
     }
+

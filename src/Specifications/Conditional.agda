@@ -1,7 +1,9 @@
 module Specifications.Conditional where
 
-open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Product using (_×_; _,_)
+
+open import Data.Sum using (_⊎_; inj₁; inj₂)
+
 open import Data.Bool using (Bool; true; false)
 
 open import Specifications.Functional

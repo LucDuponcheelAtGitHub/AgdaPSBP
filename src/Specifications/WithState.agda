@@ -1,9 +1,11 @@
 module Specifications.WithState where
 
 open import Data.Unit using (⊤)
+
 open import Data.Product using (_×_; proj₁)
 
 open import Utilities.Function
+
 open import Specifications.Functional
 open import Specifications.Sequential
 open import Specifications.Creational

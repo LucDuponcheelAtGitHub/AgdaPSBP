@@ -3,13 +3,14 @@ module Mains.Function.Functorial.PlusOneTimesTwo where
 
 open import Data.Nat using (ℕ)
 open import Data.Nat.Show using (show)
+
 open import IO
 
-open import Examples.Functorial.PlusOneTimesTwo using (plusOneTimesTwo)
-open import Implementations.Function using 
-  (functionFunctional; functionFunctorial)
+open import Implementations.Function using (functionFunctional; functionFunctorial)
 
 open import Materializations.Function using (materializeFunction)
+
+open import Examples.Functorial.PlusOneTimesTwo using (plusOneTimesTwo)
 
 instance
   _ = functionFunctional

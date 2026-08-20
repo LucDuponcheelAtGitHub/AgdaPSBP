@@ -1,12 +1,18 @@
 module Examples.Functional.Primitives where
 
 open import Data.Product using (_×_; _,_)
+
 open import Data.Nat using (ℕ; _+_; _*_; pred; suc)
 open import Data.Bool using (Bool; true; false)
+
 open import Utilities.Function using (function)
+
 open import Specifications.Functional
 
 open Functional {{...}}
+
+duplicateFunction : {Z : Set} → function Z (Z × Z)
+duplicateFunction = λ z → (z , z)
 
 plusOneFunction : function ℕ ℕ
 plusOneFunction = λ n → n + 1
@@ -37,6 +43,11 @@ addFunction (ln , rn) = ln + rn
 
 timesFunction : function (ℕ × ℕ) ℕ
 timesFunction (ln , rn) = ln * rn
+
+duplicate :
+   {program : Set → Set → Set}
+   {{_ : Functional program}} → {Z : Set} → program  Z (Z × Z)
+duplicate = asProgram duplicateFunction 
 
 plusOne : 
   {program : Set → Set → Set}

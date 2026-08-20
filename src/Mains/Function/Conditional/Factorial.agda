@@ -3,12 +3,19 @@ module Mains.Function.Conditional.Factorial where
 
 open import Data.Nat using (ℕ)
 open import Data.Nat.Show using (show)
+
 open import IO
 
-open import Examples.Conditional.Factorial using (factorial)
 open import Implementations.Function using
-  (functionFunctional; functionFunctorial; functionSequential; functionCreational; functionConditional)
+  (functionFunctional;
+   functionFunctorial;
+   functionSequential;
+   functionCreational;
+   functionConditional)
+
 open import Materializations.Function using (materializeFunction)
+
+open import Examples.Conditional.Factorial using (factorial)
 
 instance
   _ = functionFunctional

@@ -1,6 +1,6 @@
 module Materializations.ComputationValuedFunction where
 
-open import Utilities.Function
+open import Utilities.ComputationValuedFunction
 
 materializeComputationValuedFunction :
   {M : Set → Set} {Z Y : Set} →

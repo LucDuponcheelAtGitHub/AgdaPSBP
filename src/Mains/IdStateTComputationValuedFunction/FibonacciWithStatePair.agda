@@ -10,9 +10,11 @@ open import IO
 open import Utilities.Function
 open import Utilities.ComputationValuedFunction using (computationValuedFunction)
 open import Examples.WithState.FibonacciWithStatePair using (fibonacciWithStatePair)
-open import Implementations.IdComputation using (Id)
-open import Implementations.StateTComputationWithState
+open import Implementations.StateT
 open import Materializations.IdStateTComputationValuedFunction using (materializeIdStateTComputationValuedFunction)
+
+open import Effect.Monad.State.Transformer as StateTModule public
+  using (StateT; mkStateT; runStateT)
 
 open IdStateTInstance {ℕ}
 
@@ -27,26 +29,22 @@ instance
 instance
   _ = computationValuedFunctionStateTWithState
 
-materializedFibonacciWithStatePair : ℕ → ((ℕ × ℕ) × ℕ)
-materializedFibonacciWithStatePair = 
-  materializeIdStateTComputationValuedFunction 
-    (fibonacciWithStatePair {program = computationValuedFunction (StateT ℕ Id)}) tt
+materializedFibonacciWithStatePair : ⊤ → ℕ → ((ℕ × ℕ) × ℕ)
+materializedFibonacciWithStatePair = materializeIdStateTComputationValuedFunction (
+  fibonacciWithStatePair {program = computationValuedFunction (StateT ℕ Identity)})
 
 n = 10
 
 main : Main
 main = run (
   do 
-    let
-      initialState = n 
-      ((result1 , result2) , finalState) = materializedFibonacciWithStatePair n
+    let ((fib1 , fib2) , finalState) = materializedFibonacciWithStatePair tt n
     putStr "fibonacciWithStatePair initial state = "
-    putStrLn (show initialState)
+    putStrLn (show n)
     putStr "First fibonacciPair result = "
-    putStr (show result1)
-    putStr "\nSecond fibonacciPair result = "
-    putStr (show result2)
-    putStr "\nFinal state after two increments (+2) = "
+    putStrLn (show fib1)
+    putStr "Second fibonacciPair result = "
+    putStrLn (show fib2)
+    putStr "Final state after two increments (+2) = "
     putStrLn (show finalState)
   )
-

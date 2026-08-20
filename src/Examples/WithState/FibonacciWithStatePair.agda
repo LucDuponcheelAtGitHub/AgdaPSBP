@@ -1,8 +1,10 @@
 module Examples.WithState.FibonacciWithStatePair where
 
-open import Data.Nat using (ℕ)
 open import Data.Unit using (⊤)
+
 open import Data.Product using (_×_)
+
+open import Data.Nat using (ℕ)
 
 open import Specifications.Functional
 open import Specifications.Sequential
@@ -17,9 +19,6 @@ open Sequential {{...}}
 open Creational {{...}}
 open Conditional {{...}}
 open WithState {{...}}
-
--- It illustrates that statefulness is an algebraic property of computation flow,
--- not a requirement for physical memory side-effects! 
 
 {-# TERMINATING #-}
 fibonacciWithStatePair :

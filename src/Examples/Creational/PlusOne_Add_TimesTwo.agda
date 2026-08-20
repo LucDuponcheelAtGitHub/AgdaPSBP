@@ -2,6 +2,7 @@ module Examples.Creational.PlusOne_Add_TimesTwo where
 
 open import Data.Nat using (ℕ)
 open import Data.Product using (_×_)
+
 open import Specifications.Functional
 open import Specifications.Functorial
 open import Specifications.Creational

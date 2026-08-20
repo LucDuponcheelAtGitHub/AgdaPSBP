@@ -1,6 +1,7 @@
 module Examples.Creational.Self_Add_PlusOne where
 
 open import Data.Nat using (ℕ)
+
 open import Specifications.Functional
 open import Specifications.Sequential
 open import Specifications.Creational

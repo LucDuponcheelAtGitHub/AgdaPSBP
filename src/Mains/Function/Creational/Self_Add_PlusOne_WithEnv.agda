@@ -1,16 +1,22 @@
 {-# OPTIONS --guardedness #-}
 module Mains.Function.Creational.Self_Add_PlusOne_WithEnv where
 
+open import Data.Product using (_×_; _,_)
+
+open import Data.Unit using (⊤; tt)
+
 open import Data.Nat using (ℕ)
 open import Data.Nat.Show using (show)
-open import Data.Unit using (⊤; tt)
-open import Data.Product using (_×_; _,_)
+
 open import IO
 
-open import Examples.Creational.Self_Add_PlusOne_WithEnv using (self_Add_PlusOne_WithEnv)
 open import Implementations.Function using
   (functionFunctional; functionSequential; functionCreational)
+
 open import Materializations.Function using (materializeFunction)
+
+open import Examples.Creational.Self_Add_PlusOne_WithEnv 
+  using (self_Add_PlusOne_WithEnv)
 
 instance
   _ = functionFunctional

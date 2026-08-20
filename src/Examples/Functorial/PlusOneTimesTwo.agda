@@ -1,10 +1,11 @@
 module Examples.Functorial.PlusOneTimesTwo where
 
 open import Data.Nat using (ℕ)
+
 open import Specifications.Functional
 open import Specifications.Functorial
 
-open import Examples.Functional.Primitives using (timesTwoFunction; plusOne; timesTwo)
+open import Examples.Functional.Primitives using (timesTwoFunction; plusOne)
 
 open Functional {{...}}
 open Functorial {{...}}

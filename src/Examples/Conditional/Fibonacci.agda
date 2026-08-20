@@ -1,7 +1,9 @@
 module Examples.Conditional.Fibonacci where
 
-open import Data.Nat using (ℕ)
 open import Data.Product using (_×_)
+
+open import Data.Nat using (ℕ)
+
 open import Specifications.Functional
 open import Specifications.Sequential
 open import Specifications.Creational
