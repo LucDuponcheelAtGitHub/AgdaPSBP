@@ -32,36 +32,36 @@ parDrama z2x y2w (z, y) cont = do
     reactor :: ((x, w) -> Actor (Message x w) ()) -> Actor (Message x w) ()
     reactor cont = receive $ \case
       LeftReact x -> do
-        liftIO $ putStrLn $ "\t [Reactor] receives LeftReact (" ++ showVal x ++ ")"
+        -- liftIO $ putStrLn $ "\t [Reactor] receives LeftReact (" ++ showVal x ++ ")"
         receive $ \case
           RightReact w -> do
-            liftIO $ putStrLn $ 
-              "\t [Reactor] receives RightReact (" ++ showVal w ++ ")" ++ 
-                " -> combining (" ++ showVal x ++ ", " ++ showVal w ++ ")"
+            -- liftIO $ putStrLn $ 
+            --   "\t [Reactor] receives RightReact (" ++ showVal w ++ ")" ++ 
+            --     " -> combining (" ++ showVal x ++ ", " ++ showVal w ++ ")"
             cont (x, w)
           LeftReact _ -> error "Unexpected duplicate LeftReact"
       RightReact w -> do
-        liftIO $ putStrLn $ "\t [Reactor] receives RightReact (" ++ showVal w ++ ")"
+        -- liftIO $ putStrLn $ "\t [Reactor] receives RightReact (" ++ showVal w ++ ")"
         receive $ \case
           LeftReact x -> do
-            liftIO $ putStrLn $ 
-              "\t [Reactor] receives LeftReact (" ++ showVal x ++ ")" ++
-                " -> combining (" ++ showVal x ++ ", " ++ showVal w ++ ")"
+            -- liftIO $ putStrLn $ 
+            --   "\t [Reactor] receives LeftReact (" ++ showVal x ++ ")" ++
+            --     " -> combining (" ++ showVal x ++ ", " ++ showVal w ++ ")"
             cont (x, w)
           RightReact _ -> error "Unexpected duplicate RightReact"
 
     leftActor :: Address (Message x w) -> Actor (Message x w) ()
     leftActor reactorAddr = do
       z2x z (\x -> do
-        liftIO $ putStrLn $ 
-          "\t [LeftActor] finished left branch" ++
-            " -> sending LeftReact (" ++ showVal x ++ ")"
+        -- liftIO $ putStrLn $ 
+        --   "\t [LeftActor] finished left branch" ++
+        --     " -> sending LeftReact (" ++ showVal x ++ ")"
         cast reactorAddr (LeftReact x))
 
     rightActor :: Address (Message x w) -> Actor (Message x w) ()
     rightActor reactorAddr = do
       y2w y (\w -> do
-        liftIO $ putStrLn $
-          "\t [RightActor] finished right branch" ++
-            " -> sending RightReact (" ++ showVal w ++ ")"
+        -- liftIO $ putStrLn $
+        --   "\t [RightActor] finished right branch" ++
+        --     " -> sending RightReact (" ++ showVal w ++ ")"
         cast reactorAddr (RightReact w))

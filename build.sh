@@ -45,4 +45,4 @@ export PATH="$HOME/.cabal/bin:$PATH"
 # agda --compile --ghc-flag=-package --ghc-flag=text --ghc-flag=-v0 src/Mains/IdContTComputationValuedFunction/FibonacciWithCont.agda
 
 echo -e "\e[31mbuilding Mains.DramaActorContTComputationValuedFunction.FibonacciWithPar\e[0m"
-agda --compile --ghc-flag=-package --ghc-flag=drama --ghc-flag=-package --ghc-flag=transformers --ghc-flag=-package --ghc-flag=text --ghc-flag=-v0 src/Mains/DramaActorContTComputationValuedFunction/FibonacciWithPar.agda
+agda --compile --ghc-flag=-threaded --ghc-flag=-rtsopts --ghc-flag=-O2 --ghc-flag=-package --ghc-flag=drama --ghc-flag=-package --ghc-flag=transformers --ghc-flag=-package --ghc-flag=text --ghc-flag=-v0 src/Mains/DramaActorContTComputationValuedFunction/FibonacciWithPar.agda
