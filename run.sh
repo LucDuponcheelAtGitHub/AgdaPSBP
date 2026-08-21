@@ -42,5 +42,5 @@ echo "running Mains.IdStateTComputationValuedFunction.FibonacciWithStatePair"
 echo "running Mains.IdContTComputationValuedFunction.FibonacciWithCont"
 ./src/FibonacciWithCont
 
-echo "running Mains.DramaActor.FibonacciWithPar"
+echo "running Mains.DramaActorContTComputationValuedFunction.FibonacciWithPar"
 ./src/FibonacciWithPar

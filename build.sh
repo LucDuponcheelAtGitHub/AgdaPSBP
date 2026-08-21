@@ -44,5 +44,5 @@ export PATH="$HOME/.cabal/bin:$PATH"
 # echo -e "\e[31mbuilding Mains.IdContTComputationValuedFunction.FibonacciWithCont\e[0m"
 # agda --compile --ghc-flag=-package --ghc-flag=text --ghc-flag=-v0 src/Mains/IdContTComputationValuedFunction/FibonacciWithCont.agda
 
-echo -e "\e[31mbuilding Mains.DramaActor.FibonacciWithPar\e[0m"
-agda --compile --ghc-flag=-package --ghc-flag=drama --ghc-flag=-package --ghc-flag=transformers --ghc-flag=-package --ghc-flag=text --ghc-flag=-v0 src/Mains/DramaActor/FibonacciWithPar.agda
+echo -e "\e[31mbuilding Mains.DramaActorContTComputationValuedFunction.FibonacciWithPar\e[0m"
+agda --compile --ghc-flag=-package --ghc-flag=drama --ghc-flag=-package --ghc-flag=transformers --ghc-flag=-package --ghc-flag=text --ghc-flag=-v0 src/Mains/DramaActorContTComputationValuedFunction/FibonacciWithPar.agda
