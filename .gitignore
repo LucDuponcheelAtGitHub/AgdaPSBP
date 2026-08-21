@@ -18,5 +18,7 @@
 /src/Self_Add_PlusOne_WithEnv
 /src/TimesTwo_Add_PlusOne
 /src/TimesTwoPlusOne_TimesTwo
-/src/PSBP/DramaActor.hi
-/src/PSBP/DramaActor.o
+/src/Haskell/DramaActor.hi
+/src/Haskell/DramaActor.o
+/src/IdTimesTwo_Add_PlusOne
+/src/PlusOne
