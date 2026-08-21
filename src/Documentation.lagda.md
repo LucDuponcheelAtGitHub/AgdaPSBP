@@ -7,9 +7,18 @@ module Documentation where
 ```
 
 The goal of this project is to write a pointfree programming DSL, called `PSBP` in `Agda`.
-./ru    ogram specifications) that are closed
-software components that can be used like hardware components, for example Lego components,
-without opening them.
+
+DSL stands for Domain Specific Language.
+
+`PSBP` stands for Program Specification Based Programming.
+
+This documentation is not an `Agda` course.
+
+This documentation is a, somewhat opinionated, programming course.
+
+Using this DSL you can write programs (in fact they are program specifications) that are closed
+software components that can be compared with hardware components that can be used without opening
+them.
 
 We stricly distinguish the word 'program', belonging to the DSL. from the word 'code' belonging to
 the `Agda` encoding of the DSL.
