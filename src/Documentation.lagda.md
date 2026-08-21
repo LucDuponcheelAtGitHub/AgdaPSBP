@@ -17,16 +17,18 @@ This documentation is not an `Agda` course.
 This documentation is a, somewhat opinionated, programming course.
 
 Using this DSL you can write programs (in fact they are program specifications) that are closed
-software components that can be compared with hardware components that can be used without opening
-them.
+software components that can be used like hardware components, for example Lego components,
+without opening them.
 
 We stricly distinguish the word 'program', belonging to the DSL. from the word 'code' belonging to
 the `Agda` encoding of the DSL.
 
 You can argue that this goal has already be achieved,
 see [Backus FP](https://en.wikipedia.org/wiki/FP_(programming_language)), but `FP` only deals with
-pure functions in a pointfree way. Moreover `FP` is an implementation level programming language.
-`PSBP` is a specification level programming library providing more flexibility.
+pure functions in a pointfree way.
+
+Moreover `FP` is an implementation level programming language. `PSBP` is a specification level
+programming library providing more flexibility.
 
 This documentation has examples that are compilable/runnable code.
 
@@ -61,14 +63,11 @@ function.
   z bind f = f z
 ```
 
-The two definitions are equivalent. From a syntax point of view one can argue that the expression
-defining `_bind_` reads more conveniently from left to right. More about this later.
+The two definitions are equivalent. From a syntax point of view one can argue that expressions
+using `_bind_` are more convenient to read from left to right. More about this later.
 
 We can now define function composition `_o_` and `_>>>_`, and those kind of things are what library
 devolpers do all the time.
-
-A pointfree programming library would allow library users to only use expressions like `g o f` and
-`f >>> g`, that do not mention any values, a.k.a. points, like `z`. More about this later.
 
 ```agda
   infixr 8 _o_
@@ -80,10 +79,11 @@ A pointfree programming library would allow library users to only use expression
   f >>> g = λ z → z bind f bind g 
 ```
 
+A pointfree programming library would allow library users to only use expressions like `g o f` and
+`f >>> g`, that do not mention any values, a.k.a. points, like `z`. More about this later.
+
 Functions like `f` and `g` can then be seen as closed components that are combined using
-combinators like `_o_` and `_>>>_`.  Below is another combinator `_|x|_`. Using both
-`_>>>_` and `_|x|_` library users can write functions like `λ z → (z + 1) + (z * 2)` in a
-pointfree way.
+combinators like `_o_` and `_>>>_`.  Below is another combinator `_|x|_`.
 
 ```agda
   open import Data.Product using (_×_; _,_)
@@ -91,7 +91,12 @@ pointfree way.
   infixr 7 _|x|_
   _|x|_ : (ℕ → ℕ) → (ℕ → ℕ) → (ℕ → ℕ × ℕ) 
   f |x| g = λ z → (f z , g z)
+```
 
+Using both `_>>>_` and `_|x|_` library users can write functions like `λ z → (z + 1) + (z * 2)` in
+a pointfree way.
+
+```agda
   add : (ℕ × ℕ) → ℕ
   add = λ (z , y) → z + y
 
@@ -99,7 +104,7 @@ pointfree way.
   plusOne_Add_TimesTwo = (plusOne |x| timesTwo) >>> add
 ```
 
-All this starts looking like combining hardware components, for example Lego components.
+All this starts looking like combining hardware components.
 
 So far we have been using pure functions, but programming is also about side effects, external
 ones such as reading from the console and writing to the console, internal ones such as
@@ -109,7 +114,7 @@ Side effects are typically handled by using computations that, when executed, ma
 side effects as opposed to expressions that, when evaluated, must not perform side
 effects.
 
-When using monads to model computations one can write code like the one below
+Computations are modeles using monads.
 
 ```agda
 open import Data.Nat using (ℕ; _+_)
@@ -118,7 +123,11 @@ record Monad (M : Set → Set) : Set₁ where
   field
     mResult : ∀ {Z : Set} → Z → M Z
     _mBind_ : ∀ {Z Y : Set} → M Z → (Z → M Y) → M Y
+```
 
+Using monads one can write code like the one below
+
+```agda
 open Monad {{...}}
 
 mPlusOne_Add_TimesTwo : {M : Set → Set} → {{_ : Monad M}} → M ℕ → M ℕ → M ℕ
@@ -137,7 +146,7 @@ Computations are also components that can be combined with combinators `mBind` a
 
 Clearly they are not closed components. In order to have both `z` and `y` available for
 `mResult` we had to open `mz` and `my` using `mz mBind (λ z → ...)` and `my mBind (λ y → ...)`.
-That would be like opening a Lego component in order to find something to connect it with
+That would be like opening a Lego component in order to find something in it to connect it with
 another component.
 
 Is pointfree programming the "silver bullet"? Well, no, it is not.
@@ -158,8 +167,7 @@ painful, and the resulting pointfree code can hardly be called elegant.
 The `PSBP` library enables positional programming which can be seen as pointful programming in
 a pointfree way. Positional code is, in no way, more elegant than, say, traditional pointful code,
 but the idea behind pointfree programming using the `PSBP` library is to limit positional
-programming to, say, simple script like sequential programs assembling programs to a `main` like
-program.
+programming to, say, simple script like sequential programs.
 
 Recall Erik Meyer's quote "Great programmers write baby code".
 
@@ -199,7 +207,7 @@ Which functions are considered to be primitive is a choice.
 
 Note that they are the functions that cannot enjoy the benefits of `PSBP`.
 
-For now we define some primitive programs.Some like `duplicate`, are generic, others, like
+For now we define some primitive programs. Some like `duplicate`, are generic, others, like
 `plusOne` are specific, others, like `one` are mixed.
 
 Expect the amount of primitive programs to grow by need.
@@ -299,7 +307,7 @@ times = asProgram timesFunction
 
 ### Program examples
 
-The primitives programs of the previous section are program examples.
+Primitives programs, like `plusOne` are program examples.
 
 ### `functionFunctional` implementation
 
@@ -313,10 +321,11 @@ functionFunctional = record { asProgram = λ f → f }
 ### `materializeFunction` materialization
 
 It should not come as a surprise that functions, `function Z Y`, are materialized as functions
-`function Z Y` using `materializeFunction`.
+`Z → Y` using `materializeFunction`.
+
 
 ```agda
-materializeFunction : {Z Y : Set} → function Z Y → function Z Y
+materializeFunction : {Z Y : Set} → function Z Y → (Z → Y)
 materializeFunction = λ f → f
 ```
 
@@ -442,18 +451,18 @@ record Sequential (program : Set → Set → Set) : Set₁ where
 
 ### Program examples
 
-Program `timesTwoPlusOneTimesTwo` sequentially composes program `timesTwo` and `plusOne`, and then
+Program `timesTwoPlusOne_TimesTwo` sequentially composes program `timesTwo` and `plusOne`, and then
 `timesTwoFunction` acts upon the composition by multiplying its result by `2`.
 
 ```agda
 open Sequential {{...}}
 
-timesTwoPlusOneTimesTwo : 
+timesTwoPlusOne_TimesTwo : 
   {program : Set → Set → Set} 
   {{_ : Functional program}} 
   {{_ : Functorial program}} 
   {{_ : Sequential program}} → program ℕ ℕ
-timesTwoPlusOneTimesTwo = timesTwo >>> plusOne >== timesTwoFunction
+timesTwoPlusOne_TimesTwo = timesTwo >>> plusOne >== timesTwoFunction
 ```
 
 ### `functionSequential` implementation
@@ -465,14 +474,14 @@ functionSequential : Sequential function
 functionSequential = record { andThenProgram = λ f g → g ∘ f }
 ```
 
-### `mainTimesTwoPlusOneTimesTwo` using `timesTwoPlusOneTimesTwo`
+### `mainTimesTwoPlusOneTimesTwo` using `timesTwoPlusOne_TimesTwo`
 
 ```agda
 instance
   _ = functionSequential
 
 materializedTimesTwoPlusOneTimesTwo : ℕ → ℕ
-materializedTimesTwoPlusOneTimesTwo = materializeFunction timesTwoPlusOneTimesTwo
+materializedTimesTwoPlusOneTimesTwo = materializeFunction timesTwoPlusOne_TimesTwo
 
 mainTimesTwoPlusOneTimesTwo : Main
 mainTimesTwoPlusOneTimesTwo = run (
@@ -494,7 +503,7 @@ $ ./Documentation
 ## `Creational`
 
 The next specification declares `sequentialProduct` sequentially using programs `program Z Y` and
-programs `program Z X` yielding programs `program Z (Y × X)` producing a product result`Y × X`.
+programs `program Z X` yielding programs `program Z (Y × X)` producing a product `Y × X`.
 
 The specification also defines `_|x|_`, an infix version of `sequentialProduct`.
 
@@ -507,17 +516,16 @@ consisting of the given `Z` and the created `Y` to yield a result `Z`. Think of 
 think of the intermediate result `Y` as local value, and think of `X` as a final result.
 
 As such, nested `LET_IN_`s can be used to create an environment, consisting of an argument and many
-intermediate results as local values.
-... . 
+intermediate results as local values. 
 
 The specification also defines `_AT_ANDTHEN_` which uses this environment explicitly. It also
-defines environment positions like `P1`, `P2` and `V12` to access the argument and local values
+defines environment positions like `P1`, `P2` and `P21` to access the argument and/or local values
 of this environment at their position.
 
-Think of using `_AT_ANDTHEN_` together with local value positions like `P1`, `P2` and `P21`, as
-pointful programming in a pointfree way. Agreed we introduce pointfree programming again, using
-natural number indices to access local values in the environment, but, typically, `_AT_ANDTHEN_` is
-used for simple, script like sequential programs with a simple environment.
+Think of using `_AT_ANDTHEN_` together with argument and local value positions like `P1`, `P2` and
+`P21`, as pointful programming in a pointfree way. Agreed we introduce pointfree programming again,
+using natural number indices to access local values in the environment, but, typically,
+`_AT_ANDTHEN_` is used for simple, script like sequential programs with a simple environment.
 
 ### `Creational` specification
 
@@ -659,7 +667,7 @@ $ ./Documentation
 ### Program examples
 
 Program `self_Add_PlusOne` creates a local value that is the intermediate result of `plusOne`
-and then uses `add` to add its argument and the created local value.
+and then uses `add` to add its argument and that local value.
 
 ```agda
 self_Add_PlusOne : 
@@ -1447,6 +1455,81 @@ module DramaActorInstance {msg : Set} where
         λ {Z} {Y} {X} {W} f g (z , y) k → 
           dramaActorPar f g (pair z y) (λ { (pair x w) → k (x , w) })
     }
+```
+
+###  Haskell code
+
+The Haskell code implementing `parDrama` is below
+
+
+```haskell
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+
+module PSBP.DramaActor where
+
+import Drama ( cast, receive, spawn, wait, Actor, Address )
+import Control.Monad.IO.Class (liftIO)
+import Unsafe.Coerce (unsafeCoerce)
+
+data Message x w res where
+  LeftReact  :: x -> Message x w ()
+  RightReact :: w -> Message x w ()
+
+showVal :: a -> String
+showVal v = show (unsafeCoerce v :: Integer)
+
+parDrama :: forall z y x w.
+            (z -> (x -> Actor (Message x w) ()) -> Actor (Message x w) ())
+         -> (y -> (w -> Actor (Message x w) ()) -> Actor (Message x w) ())
+         -> (z, y)
+         -> ((x, w) -> Actor (Message x w) ())
+         -> Actor (Message x w) ()
+parDrama z2x y2w (z, y) cont = do
+  reactorAddr <- spawn (reactor cont)
+  _ <- spawn (leftActor reactorAddr)
+  _ <- spawn (rightActor reactorAddr)
+  wait
+  where
+    reactor :: ((x, w) -> Actor (Message x w) ()) -> Actor (Message x w) ()
+    reactor cont = receive $ \case
+      LeftReact x -> do
+        liftIO $ putStrLn $ "\t [Reactor] receives LeftReact (" ++ showVal x ++ ")"
+        receive $ \case
+          RightReact w -> do
+            liftIO $ putStrLn $ 
+              "\t [Reactor] receives RightReact (" ++ showVal w ++ ")" ++ 
+                " -> combining (" ++ showVal x ++ ", " ++ showVal w ++ ")"
+            cont (x, w)
+          LeftReact _ -> error "Unexpected duplicate LeftReact"
+      RightReact w -> do
+        liftIO $ putStrLn $ "\t [Reactor] receives RightReact (" ++ showVal w ++ ")"
+        receive $ \case
+          LeftReact x -> do
+            liftIO $ putStrLn $ 
+              "\t [Reactor] receives LeftReact (" ++ showVal x ++ ")" ++
+                " -> combining (" ++ showVal x ++ ", " ++ showVal w ++ ")"
+            cont (x, w)
+          RightReact _ -> error "Unexpected duplicate RightReact"
+
+    leftActor :: Address (Message x w) -> Actor (Message x w) ()
+    leftActor reactorAddr = do
+      z2x z (\x -> do
+        liftIO $ putStrLn $ 
+          "\t [LeftActor] finished left branch" ++
+            " -> sending LeftReact (" ++ showVal x ++ ")"
+        cast reactorAddr (LeftReact x))
+
+    rightActor :: Address (Message x w) -> Actor (Message x w) ()
+    rightActor reactorAddr = do
+      y2w y (\w -> do
+        liftIO $ putStrLn $
+          "\t [RightActor] finished right branch" ++
+            " -> sending RightReact (" ++ showVal w ++ ")"
+        cast reactorAddr (RightReact w))
 ```
 
 ### `materializeDramaActorComputationValuedFunction` materialization

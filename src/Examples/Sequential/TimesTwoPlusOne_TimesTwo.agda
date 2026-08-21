@@ -1,4 +1,4 @@
-module Examples.Sequential.TimesTwoPlusOneTimesTwo where
+module Examples.Sequential.TimesTwoPlusOne_TimesTwo where
 
 open import Data.Nat using (ℕ)
 open import Specifications.Functional
@@ -11,12 +11,12 @@ open Functional {{...}}
 open Functorial {{...}}
 open Sequential {{...}}
 
-timesTwoPlusOneTimesTwo : 
+timesTwoPlusOne_TimesTwo : 
   {program : Set → Set → Set} 
   {{_ : Functional program}} 
   {{_ : Functorial program}} 
   {{_ : Sequential program}} → program ℕ ℕ
-timesTwoPlusOneTimesTwo = timesTwo >>> plusOne >== timesTwoFunction
+timesTwoPlusOne_TimesTwo = timesTwo >>> plusOne >== timesTwoFunction
 
 
 
