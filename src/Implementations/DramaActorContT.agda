@@ -1,4 +1,4 @@
-module Implementations.DramaActor where
+module Implementations.DramaActorContT where
 
 open import Level using (zero)
 open import Data.Unit using (⊤; tt)
@@ -32,7 +32,7 @@ postulate
       computationValuedFunction (ContT ⊤ (DramaActor msg)) Y W →
       Pair Z Y → ContT ⊤ (DramaActor msg) (Pair X W)
 
-{-# FOREIGN GHC import qualified PSBP.DramaActor as Drama #-}
+{-# FOREIGN GHC import qualified Haskell.DramaActor as Drama #-}
 {-# FOREIGN GHC import qualified Drama as D #-}
 {-# FOREIGN GHC import Control.Monad.Trans.Cont (ContT(..)) #-}
 {-# FOREIGN GHC import Unsafe.Coerce (unsafeCoerce) #-}

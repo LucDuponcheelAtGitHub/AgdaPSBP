@@ -7,16 +7,7 @@ module Documentation where
 ```
 
 The goal of this project is to write a pointfree programming DSL, called `PSBP` in `Agda`.
-
-DSL stands for Domain Specific Language.
-
-`PSBP` stands for Program Specification Based Programming.
-
-This documentation is not an `Agda` course.
-
-This documentation is a, somewhat opinionated, programming course.
-
-Using this DSL you can write programs (in fact they are program specifications) that are closed
+./ru    ogram specifications) that are closed
 software components that can be used like hardware components, for example Lego components,
 without opening them.
 
@@ -751,16 +742,18 @@ self_Add_PlusOne_WithEnv (tt, 10) = 22
 So why is this result `22`?
 
 - The first `plusOne AT P1` accesses the argument `10` at position `1` since the environment at
-that that usage point is `(⊤ , 10)`.
+that that usage point is
+  - `(⊤ , 10)`.
 - The second `plusOne AT P2` accesses the argument `10` at position `2` since the environment at
-that that usage is point `((⊤ , 10) , 11)`. 
+that that usage point is
+  - `((⊤ , 10) , 11)`. 
 - The third `add AT P21` accesses the local values `11` and `11` at position `2` and `1`, since
-the environment at that usage is point `(((⊤ , 10) , 11), 11)`, and  creates a product`(11 , 11)`.
+the environment at that usage point is
+  - `(((⊤ , 10) , 11), 11)`.
 
 So, if, for example, `plusOne AT P2` is replaced by `plusOne AT P1` the final result is `23`.
 
-You wiil soon get used to this positional programming.
-
+You will soon get used to this positional programming.
 
 ### Program examples 
 
@@ -823,12 +816,12 @@ final result3 = 22
 ## `Conditional`
 
 The next specification declares `sum` using programs `program Z X` and
-programs `program Y X` yielding programs `program (Z ⊎ Y) X` consuming a sum argument`Z ⊎ Y`.
+programs `program Y X` yielding programs `program (Z ⊎ Y) X` consuming a sum `Z ⊎ Y`.
 
 The specification also defines `_|+|_`, an infix version of `sum`.
 
-The specification also defines `IF_THEN_ELSE_`, a pointfree library level version of the pointful
-language level `if ... then ... else ...` . 
+The specification also defines `IF_THEN_ELSE_`, a pointfree library level version of the language
+level `if ... then ... else ...` . 
 
 ### `Conditional` specification
 
@@ -1034,8 +1027,8 @@ module ComputationValuedFunctionInstances
 ### `materializeIdComputationValuedFunction` materialization
 
 It should not come as a surprise that computation valued functions,
-`computationValuedFunction Id Z Y`, are materialized as functions
-`function Z Y` using `materializeIdComputationValuedFunction`.
+`computationValuedFunction Identity Z Y`, are materialized as functions
+`Z → Y` using `materializeIdComputationValuedFunction`.
 
 ```agda
 open import Effect.Monad.Identity as IdentityModule public
@@ -1043,7 +1036,7 @@ open import Effect.Monad.Identity as IdentityModule public
 
 materializeIdComputationValuedFunction :
   {Z Y : Set} →
-  computationValuedFunction Identity Z Y → function Z Y
+  computationValuedFunction Identity Z Y → (Z → Y)
 materializeIdComputationValuedFunction f z = runIdentity (f z)
 ```
 
@@ -1146,7 +1139,7 @@ fibonacciWithState =
   readState >>> fibonacci >>> modifyStateWith plusOne
 ```
 
-### `stateTMonad` and `computationValuedFunctionStateTWithState` implementation
+### `stateTMonad` and `stateTWithState` implementation
 
 `StateT S` transforms a computation to a computation that threads a state along its execution. 
 
@@ -1167,9 +1160,8 @@ module StateTInstances {S : Set} {M : Set → Set} (monad : RawMonad {zero} {zer
 
   open ComputationValuedFunctionInstances stateTMonad public
 
-  computationValuedFunctionStateTWithState : 
-    WithState S (computationValuedFunction (StateT S M))
-  computationValuedFunctionStateTWithState = record
+  stateTWithState : WithState S (computationValuedFunction (StateT S M))
+  stateTWithState = record
     { readState = λ _ → mkStateT (λ s → RawMonad.pure monad (s , s))
     ; writeState = λ s' → mkStateT (λ s → RawMonad.pure monad (s' , tt))
     }
@@ -1184,20 +1176,20 @@ module IdStateTInstance {S : Set} where
   open StateTInstances {S} {Identity} IdentityModule.monad public
 ```
 
-### `materializeIdStateTComputationValuedFunction` materialization
+### `materializeIdStateT` materialization
 
 The most verbose way to materialize computation valued functions
 `computationValuedFunction (StateT S Id) Z Y` is as functions
-`function Z (function S (Y × S))`
+`(Z → (S → (Y × S)))`
 
 
 ```agda
 open import Effect.Monad.State.Transformer as StateTModule public using (runStateT)
 
-materializeIdStateTComputationValuedFunction :
+materializeIdStateT :
   {S Z Y : Set} →
-  computationValuedFunction (StateT S Identity) Z Y → function Z (function S (Y × S))
-materializeIdStateTComputationValuedFunction f z s =
+  computationValuedFunction (StateT S Identity) Z Y → (Z → (S → (Y × S)))
+materializeIdStateT f z s =
   let (s' , y) = runIdentity (runStateT (f z) s)
   in (y , s')
 ```
@@ -1214,11 +1206,11 @@ instance
 instance
   _ = IdStateTInstance.computationValuedFunctionConditional {ℕ}
 instance
-  _ = IdStateTInstance.computationValuedFunctionStateTWithState {ℕ}
+  _ = IdStateTInstance.stateTWithState {ℕ}
 
 materializedFibonacciWithState : ⊤ → ℕ → (ℕ × ℕ)
 materializedFibonacciWithState = 
-  materializeIdStateTComputationValuedFunction 
+  materializeIdStateT 
     (fibonacciWithState {program = computationValuedFunction (StateT ℕ Identity)})
 
 mainFibonacciWithState : Main
@@ -1263,7 +1255,7 @@ fibonacciWithStatePair = fibonacciWithState |x| fibonacciWithState
 
 ```agda
 materializedFibonacciWithStatePair : ⊤ → ℕ → ((ℕ × ℕ) × ℕ)
-materializedFibonacciWithStatePair = materializeIdStateTComputationValuedFunction (
+materializedFibonacciWithStatePair = materializeIdStateT (
   fibonacciWithStatePair {program = computationValuedFunction (StateT ℕ Identity)})
 
 mainFibonacciWithStatePair : Main
@@ -1293,10 +1285,10 @@ Final state after two increments (+2) = 12
 
 ## Continuations
 
-### `contTMonad` and `computationValuedFunctionStateTWithState` implementation
+### `contTMonad` and `stateTWithState` implementation
 
 The continuation monad transformer `ContT R M Z = (Z → M R) → M R` transforms a computation into a
-continuation-passing style computation.
+continuation-passing style computation and, for the moment, define our own.
 
 Note that Agda has delimited continuations, where continuations are a special case of.
 
@@ -1331,13 +1323,13 @@ module IdContTInstance {R : Set} where
   open ContTInstances {R} {Identity} IdentityModule.monad public
 ```
 
-### `materializeIdContTComputationValuedFunction` materialization
+### `materializeIdContT` materialization
 
 ```agda
-materializeIdContTComputationValuedFunction :
+materializeIdContT :
   {R Z Y : Set} →
-  computationValuedFunction (ContT R Identity) Z Y → function Z ((Y → Identity R) → Identity R)
-materializeIdContTComputationValuedFunction f = f
+  computationValuedFunction (ContT R Identity) Z Y → (Z → ((Y → Identity R) → Identity R))
+materializeIdContT f = f
 ```
 
 ### `mainFibonacciWithCont` using `fibonacci`
@@ -1358,7 +1350,7 @@ instance
 
 materializedFibonacciWithCont : ℕ → (ℕ → Identity ℕ) → Identity ℕ
 materializedFibonacciWithCont = 
-  materializeIdContTComputationValuedFunction 
+  materializeIdContT 
     (fibonacci {program = computationValuedFunction (ContT ℕ Identity)})
 
 mainFibonacciWithCont : Main
@@ -1382,6 +1374,12 @@ fibonacciWithCont(10) = 89
 
 ### `WithPar` specification
 
+The `WithPar` specification declares `par` using programs `program Z Z` and
+programs `program Y W` in parallel yielding programs `rogram (Z × Y) (X × W)` consuming a
+product `Z × Y` and producing a product `X × W`.
+
+The specification also defines `_|||_`, an infix version of `par`.
+
 ```agda
 record WithPar (program : Set → Set → Set) : Set1 where
   field
@@ -1394,6 +1392,10 @@ _|||_ {{p}} = WithPar.par p
 ```
 
 ### Program examples
+
+When using `duplicate`, `fibonacciWithPar` below is defined in a similar way as `fibonacci`.
+
+`fibonacciWithPar` can also be defined without using `duplicate` (commented out).
 
 ```agda
 {-# TERMINATING #-}
@@ -1419,6 +1421,8 @@ fibonacciWithPar =
 
 ### `dramaActorMonad` and `dramaActorWithPar` implementation
 
+The implementations below use the Haskell actor library `drama`.
+
 ```agda
 data Pair (A B : Set) : Set where
   pair : A → B → Pair A B
@@ -1436,7 +1440,7 @@ postulate
       computationValuedFunction (ContT ⊤ (DramaActor msg)) Y W →
       Pair Z Y → ContT ⊤ (DramaActor msg) (Pair X W)
 
-{-# FOREIGN GHC import qualified PSBP.DramaActor as Drama #-}
+{-# FOREIGN GHC import qualified Haskell.DramaActor as Drama #-}
 {-# FOREIGN GHC import qualified Drama as D #-}
 {-# FOREIGN GHC import Control.Monad.Trans.Cont (ContT(..)) #-}
 {-# FOREIGN GHC import Unsafe.Coerce (unsafeCoerce) #-}
@@ -1469,7 +1473,7 @@ The Haskell code implementing `parDrama` is below
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module PSBP.DramaActor where
+module Haskell.DramaActor where
 
 import Drama ( cast, receive, spawn, wait, Actor, Address )
 import Control.Monad.IO.Class (liftIO)
@@ -1532,14 +1536,14 @@ parDrama z2x y2w (z, y) cont = do
         cast reactorAddr (RightReact w))
 ```
 
-### `materializeDramaActorComputationValuedFunction` materialization
+### `materializeDramaActorContT` materialization
 
 ```agda
-materializeDramaActorComputationValuedFunction :
+materializeDramaActorContT :
   {msg Z Y : Set} →
   computationValuedFunction (ContT ⊤ (DramaActor msg)) Z Y → 
-    function Z ((Y → DramaActor msg ⊤) → DramaActor msg ⊤)
-materializeDramaActorComputationValuedFunction f z k = f z k
+    Z → ((Y → DramaActor msg ⊤) → DramaActor msg ⊤)
+materializeDramaActorContT f z k = f z k
 ```
 
 ### `mainFibonacciWithPar` using `fibonacciWithPar`
@@ -1554,7 +1558,7 @@ postulate
 
   runDramaActor : {msg : Set} → DramaActor msg ⊤ → AgdaIO ⊤
 
-{-# FOREIGN GHC import qualified PSBP.DramaActor as Drama #-}
+{-# FOREIGN GHC import qualified Haskell.DramaActor as Drama #-}
 {-# FOREIGN GHC import qualified Drama as D #-}
 {-# FOREIGN GHC import Control.Monad.IO.Class (liftIO) #-}
 
@@ -1580,7 +1584,7 @@ instance
 materializedFibonacciWithPar : 
   ℕ → (ℕ → DramaActor (DramaMessage ℕ ℕ) ⊤) → DramaActor (DramaMessage ℕ ℕ) ⊤
 materializedFibonacciWithPar = 
-  materializeDramaActorComputationValuedFunction 
+  materializeDramaActorContT 
   (fibonacciWithPar 
     {program = computationValuedFunction (ContT ⊤ (DramaActor (DramaMessage ℕ ℕ)))})
 

@@ -10,7 +10,7 @@ open import Utilities.ComputationValuedFunction
 
 open import Implementations.ContT using (ContT)
 
-materializeIdContTComputationValuedFunction :
+materializeIdContT :
   {R Z Y : Set} →
-  computationValuedFunction (ContT R Identity) Z Y → function Z ((Y → Identity R) → Identity R)
-materializeIdContTComputationValuedFunction f = f
+  computationValuedFunction (ContT R Identity) Z Y → (Z → ((Y → Identity R) → Identity R))
+materializeIdContT f = f

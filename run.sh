@@ -6,8 +6,8 @@ echo "running Mains.Function.Functional.PlusOne"
 echo "running Mains.Function.Functorial.PlusOneTimesTwo"
 ./src/PlusOneTimesTwo
 
-echo "running Mains.Function.Sequential.TimesTwoPlusOneTimesTwo"
-./src/TimesTwoPlusOneTimesTwo
+echo "running Mains.Function.Sequential.TimesTwoPlusOne_TimesTwo"
+./src/TimesTwoPlusOne_TimesTwo
 
 echo "running Mains.Function.Creational.PlusOne_Add_TimesTwo"
 ./src/PlusOne_Add_TimesTwo

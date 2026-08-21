@@ -11,7 +11,7 @@ open import Utilities.Function
 open import Utilities.ComputationValuedFunction using (computationValuedFunction)
 open import Examples.WithState.FibonacciWithStatePair using (fibonacciWithStatePair)
 open import Implementations.StateT
-open import Materializations.IdStateTComputationValuedFunction using (materializeIdStateTComputationValuedFunction)
+open import Materializations.IdStateTComputationValuedFunction using (materializeIdStateT)
 
 open import Effect.Monad.State.Transformer as StateTModule public
   using (StateT; mkStateT; runStateT)
@@ -27,10 +27,10 @@ instance
 instance
   _ = computationValuedFunctionConditional
 instance
-  _ = computationValuedFunctionStateTWithState
+  _ = stateTWithState
 
 materializedFibonacciWithStatePair : ⊤ → ℕ → ((ℕ × ℕ) × ℕ)
-materializedFibonacciWithStatePair = materializeIdStateTComputationValuedFunction (
+materializedFibonacciWithStatePair = materializeIdStateT (
   fibonacciWithStatePair {program = computationValuedFunction (StateT ℕ Identity)})
 
 n = 10

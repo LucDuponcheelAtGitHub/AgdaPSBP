@@ -33,8 +33,8 @@ module StateTInstances {S : Set} {M : Set → Set} (monad : RawMonad {zero} {zer
 
   open ComputationValuedFunctionInstances stateTMonad public
 
-  computationValuedFunctionStateTWithState : WithState S (computationValuedFunction (StateT S M))
-  computationValuedFunctionStateTWithState = record
+  stateTWithState : WithState S (computationValuedFunction (StateT S M))
+  stateTWithState = record
     { readState = λ _ → mkStateT (λ s → RawMonad.pure monad (s , s))
     ; writeState = λ s' → mkStateT (λ s → RawMonad.pure monad (s' , tt))
     }

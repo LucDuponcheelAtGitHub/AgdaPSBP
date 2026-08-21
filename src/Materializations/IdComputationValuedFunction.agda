@@ -9,5 +9,5 @@ open import Utilities.ComputationValuedFunction
 
 materializeIdComputationValuedFunction :
   {Z Y : Set} →
-  computationValuedFunction Identity Z Y → function Z Y
+  computationValuedFunction Identity Z Y → (Z → Y)
 materializeIdComputationValuedFunction f z = runIdentity (f z)

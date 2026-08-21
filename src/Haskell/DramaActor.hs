@@ -4,7 +4,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module PSBP.DramaActor where
+module Haskell.DramaActor where
 
 import Drama ( cast, receive, spawn, wait, Actor, Address )
 import Control.Monad.IO.Class (liftIO)

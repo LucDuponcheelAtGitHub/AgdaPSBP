@@ -16,7 +16,7 @@ open import Examples.WithState.FibonacciWithState using (fibonacciWithState)
 
 open import Implementations.StateT
 
-open import Materializations.IdStateTComputationValuedFunction using (materializeIdStateTComputationValuedFunction)
+open import Materializations.IdStateTComputationValuedFunction using (materializeIdStateT)
 
 open import Examples.WithState.FibonacciWithState using (fibonacciWithState)
 
@@ -31,11 +31,11 @@ instance
 instance
   _ = computationValuedFunctionConditional
 instance
-  _ = computationValuedFunctionStateTWithState
+  _ = stateTWithState
 
 materializedFibonacciWithState : ⊤ → ℕ → (ℕ × ℕ)
 materializedFibonacciWithState = 
-  materializeIdStateTComputationValuedFunction 
+  materializeIdStateT 
     (fibonacciWithState {program = computationValuedFunction (StateT ℕ Identity)})
 
 n = 10

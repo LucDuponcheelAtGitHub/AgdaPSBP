@@ -16,10 +16,10 @@ open import Utilities.ComputationValuedFunction using (computationValuedFunction
 
 open import Implementations.ContT using (ContT)
 
-open import Implementations.DramaActor using (DramaActor; module DramaActorInstance)
+open import Implementations.DramaActorContT using (DramaActor; module DramaActorInstance)
 
-open import Materializations.DramaActorComputationValuedFunction using 
-  (materializeDramaActorComputationValuedFunction)
+open import Materializations.DramaActorContTComputationValuedFunction using 
+  (materializeDramaActorContT)
 
 open import Examples.WithPar.FibonacciWithPar using (fibonacciWithPar)
 
@@ -32,7 +32,7 @@ postulate
 
   runDramaActor : {msg : Set} → DramaActor msg ⊤ → AgdaIO ⊤
 
-{-# FOREIGN GHC import qualified PSBP.DramaActor as Drama #-}
+{-# FOREIGN GHC import qualified Haskell.DramaActor as Drama #-}
 {-# FOREIGN GHC import qualified Drama as D #-}
 {-# FOREIGN GHC import Control.Monad.IO.Class (liftIO) #-}
 
@@ -60,7 +60,7 @@ instance
 materializedFibonacciWithPar : 
   ℕ → (ℕ → DramaActor (DramaMessage ℕ ℕ) ⊤) → DramaActor (DramaMessage ℕ ℕ) ⊤
 materializedFibonacciWithPar = 
-  materializeDramaActorComputationValuedFunction 
+  materializeDramaActorContT 
   (fibonacciWithPar 
     {program = computationValuedFunction (ContT ⊤ (DramaActor (DramaMessage ℕ ℕ)))})
 

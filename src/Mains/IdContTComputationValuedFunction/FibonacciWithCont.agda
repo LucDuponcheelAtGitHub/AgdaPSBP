@@ -18,7 +18,7 @@ open import Utilities.ComputationValuedFunction using (computationValuedFunction
 open import Implementations.ContT using (ContT; module IdContTInstance)
 
 open import Materializations.IdContTComputationValuedFunction using 
-  (materializeIdContTComputationValuedFunction)
+  (materializeIdContT)
 
 open import Examples.Conditional.Fibonacci using (fibonacci)
 
@@ -35,7 +35,7 @@ instance
 
 materializedFibonacciWithCont : ℕ → (ℕ → Identity ℕ) → Identity ℕ
 materializedFibonacciWithCont = 
-  materializeIdContTComputationValuedFunction 
+  materializeIdContT 
     (fibonacci {program = computationValuedFunction (ContT ℕ Identity)})
 
 n = 10

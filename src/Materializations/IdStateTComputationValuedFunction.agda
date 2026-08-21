@@ -12,9 +12,9 @@ open import Utilities.Function
 
 open import Utilities.ComputationValuedFunction
 
-materializeIdStateTComputationValuedFunction :
+materializeIdStateT :
   {S Z Y : Set} →
-  computationValuedFunction (StateT S Identity) Z Y → function Z (function S (Y × S))
-materializeIdStateTComputationValuedFunction f z s =
+  computationValuedFunction (StateT S Identity) Z Y → (Z → (S → (Y × S)))
+materializeIdStateT f z s =
   let (s' , y) = runIdentity (runStateT (f z) s)
   in (y , s')
